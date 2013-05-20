@@ -25,11 +25,9 @@ if( !defined( 'MEDIAWIKI' ) ) {
 	die( -1 );
 }
 
-#----------------------------------------------------------------------------
-#    Extension initialization
-#----------------------------------------------------------------------------
 
-$wgSearchRealnamesVersion = '0.2';
+$wgSearchRealnamesVersion = '0.3 alpha';
+
 $wgExtensionCredits['parserhook'][] = array(
 	'name'=>'SearchRealnames',
 	'version'=>$wgSearchRealnamesVersion,
