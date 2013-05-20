@@ -41,20 +41,13 @@ $wgExtensionCredits['parserhook'][] = array(
 $dir = dirname(__FILE__) . '/';
 $wgExtensionMessagesFiles['SearchRealnames'] = $dir . 'SearchRealnames.i18n.php';
 $wgSearchRealnames = new SearchRealnames();
-$wgExtensionFunctions[] = array( &$wgSearchRealnames, 'setup' );
+
 $wgHooks['SpecialSearchResults'][] = array( &$wgSearchRealnames, 'onSearchResults' );
 $wgHooks['BeforePageDisplay'][] = array( &$wgSearchRealnames, 'onBeforePageDisplay' );
 
 class SearchRealnames
 {
 	private $mUsers = array();
-
-	# Setup the message catalog
-	function setup() {
-		global $wgParser;
-		wfLoadExtensionMessages('SearchRealnames');
-		return true;
-	}
 
 	# Scan the results
 	function onSearchResults( $term, &$titleMatches, &$textMatches ) {
