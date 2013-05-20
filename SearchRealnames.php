@@ -46,8 +46,7 @@ $wgHooks['BeforePageDisplay'][] = array( &$wgSearchRealnames, 'onBeforePageDispl
 class SearchRealnames {
 	private $mUsers = array();
 
-	# Scan the results
-	function onSearchResults( $term, &$titleMatches, &$textMatches ) {
+	public function onSearchResults( $term, &$titleMatches, &$textMatches ) {
 		foreach ($titleMatches as $key => $val) {
 			if ($val instanceof ResultWrapper) {
 				$p = $val;
@@ -100,7 +99,7 @@ class SearchRealnames {
 	}
 
 	# Replace text strings
-	function onBeforePageDisplay( &$out, &$sk ) {
+	public function onBeforePageDisplay( &$out, &$sk ) {
 		global $wgTitle;
 
 		if ( $wgTitle->getNamespace() >= 0 ) {
@@ -112,7 +111,7 @@ class SearchRealnames {
 		}
 
 		$text =& $out->mBodytext;
-		
+
 		$text = preg_replace_callback(
 			'/(<li><a\b[^>]*>)([^<:]*:)([^<]*)(<\\/a>)/',
 			array( &$this, 'onReplaceBeforePageDisplay'),
