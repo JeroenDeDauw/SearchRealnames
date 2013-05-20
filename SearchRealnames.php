@@ -43,8 +43,7 @@ $wgSearchRealnames = new SearchRealnames();
 $wgHooks['SpecialSearchResults'][] = array( &$wgSearchRealnames, 'onSearchResults' );
 $wgHooks['BeforePageDisplay'][] = array( &$wgSearchRealnames, 'onBeforePageDisplay' );
 
-class SearchRealnames
-{
+class SearchRealnames {
 	private $mUsers = array();
 
 	# Scan the results
@@ -58,45 +57,68 @@ class SearchRealnames
 				$val->rewind();
 			}
 		}
+
 		foreach ($textMatches as $key => $val) {
-			if ($val instanceof ResultWrapper) {
+			if ( $val instanceof ResultWrapper ) {
 				$p = $val;
-				while( $row = $p->fetchObject() )
-					if ($row->page_namespace == 2)
+
+				while( $row = $p->fetchObject() ) {
+					if ($row->page_namespace == 2) {
 						$this->mUsers[$row->page_title]++;
+					}
+				}
+
 				$val->rewind();
 			}
 		}
+
 		foreach ($this->mUsers as $key => $val) {
 			$this->mUsers[$key] = $val = User::newFromName( $key );
 		}
+
 		return true;
 	}
 
 	# Replace callback
 	private function onReplaceBeforePageDisplay( $m ) {
 		global $wgSearchRealnamesInline;
-		if ($this->mUsers[$m[3]] instanceof User) {
+
+		if ( $this->mUsers[$m[3]] instanceof User ) {
 			$realName = htmlspecialchars( trim( $this->mUsers[$m[3]]->getRealname() ) );
+
 			if ( $realName != "" ) {
-				if ($wgSearchRealnamesInline)
+				if ($wgSearchRealnamesInline) {
 					return $m[1] . wfMsg( 'search-realname-inline', $realName ) . $m[4];
-				else
+				}
+				else {
 					return $m[1] . $m[2] . $m[3] . $m[4] . wfMsg( 'search-realname-append', $realName );
+				}
 			}
 		}
+
 		return "$m[1]$m[2]$m[3]$m[4]";
 	}
 
 	# Replace text strings
 	function onBeforePageDisplay( &$out, &$sk ) {
 		global $wgTitle;
-		if ( $wgTitle->getNamespace() >= 0)
+
+		if ( $wgTitle->getNamespace() >= 0 ) {
 			return true;
-		if (!count($this->mUsers))
+		}
+
+		if ( !count( $this->mUsers ) ) {
 			return true;
+		}
+
 		$text =& $out->mBodytext;
-		$text = preg_replace_callback('/(<li><a\b[^>]*>)([^<:]*:)([^<]*)(<\\/a>)/', array( &$this, 'onReplaceBeforePageDisplay'), $text);
+		
+		$text = preg_replace_callback(
+			'/(<li><a\b[^>]*>)([^<:]*:)([^<]*)(<\\/a>)/',
+			array( &$this, 'onReplaceBeforePageDisplay'),
+			$text
+		);
+
 		return true;
 	}
 
