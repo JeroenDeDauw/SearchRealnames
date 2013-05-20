@@ -47,17 +47,18 @@ class SearchRealnames {
 	private $mUsers = array();
 
 	public function onSearchResults( $term, &$titleMatches, &$textMatches ) {
-		foreach ($titleMatches as $key => $val) {
-			if ($val instanceof ResultWrapper) {
-				$p = $val;
-				while( $row = $val->fetchObject() )
-					if ($row->page_namespace == 2)
-						$this->mUsers[$row->page_title]++;
-				$val->rewind();
-			}
+		$this->handleMatches( $titleMatches );
+		$this->handleMatches( $textMatches );
+
+		foreach ($this->mUsers as $key => $val) {
+			$this->mUsers[$key] = $val = User::newFromName( $key );
 		}
 
-		foreach ($textMatches as $key => $val) {
+		return true;
+	}
+
+	private function handleMatches( array &$matches ) {
+		foreach ( $matches as $val ) {
 			if ( $val instanceof ResultWrapper ) {
 				$p = $val;
 
@@ -70,12 +71,6 @@ class SearchRealnames {
 				$val->rewind();
 			}
 		}
-
-		foreach ($this->mUsers as $key => $val) {
-			$this->mUsers[$key] = $val = User::newFromName( $key );
-		}
-
-		return true;
 	}
 
 	# Replace callback
